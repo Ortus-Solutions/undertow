@@ -44,6 +44,10 @@ public class PathMatchPredicate implements Predicate {
         this.pathMatcher = matcher;
     }
 
+    public String toString() {
+        return "path( \"" + pathMatcher.getExactPathMatchesList() +  "\" )";
+    }
+
     @Override
     public boolean resolve(final HttpServerExchange value) {
         final String relativePath = value.getRelativePath();
