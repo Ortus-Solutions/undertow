@@ -45,7 +45,7 @@ public class PathMatchPredicate implements Predicate {
     }
 
     public String toString() {
-        return "path( \"" + pathMatcher.getExactPathMatchesList() +  "\" )";
+        return "path( '" + pathMatcher.getExactPathMatchesList() +  "' )";
     }
 
     @Override

@@ -36,6 +36,7 @@ public class TruePredicate implements Predicate {
         return true;
     }
 
+    @Override
     public String toString() {
         return "true";
     }
