@@ -35,4 +35,8 @@ public class FalsePredicate implements Predicate {
     public boolean resolve(final HttpServerExchange value) {
         return false;
     }
+
+    public String toString() {
+        return "false";
+    }
 }

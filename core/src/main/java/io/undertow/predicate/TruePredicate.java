@@ -35,4 +35,8 @@ public class TruePredicate implements Predicate {
     public boolean resolve(final HttpServerExchange value) {
         return true;
     }
+
+    public String toString() {
+        return "true";
+    }
 }

@@ -59,6 +59,11 @@ public class RegularExpressionPredicate implements Predicate {
         this(regex, matchAttribute, false);
     }
 
+    public String toString() {
+        // TODO: Convert exchange attribute to textual representation
+        return "regex( pattern='" + pattern.toString() +  "', value='%{exchange attribute}', full-match='" + Boolean.valueOf( this.requireFullMatch ) + "', case-sensitive='" + Boolean.valueOf( ( pattern.flags() & Pattern.CASE_INSENSITIVE ) == Pattern.CASE_INSENSITIVE ) + "' )";
+    }
+
     @Override
     public boolean resolve(final HttpServerExchange value) {
         String input = matchAttribute.readAttribute(value);

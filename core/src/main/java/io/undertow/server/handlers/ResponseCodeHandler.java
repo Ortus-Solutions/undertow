@@ -18,6 +18,7 @@
 
 package io.undertow.server.handlers;
 
+import io.undertow.UndertowLogger;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import org.jboss.logging.Logger;
@@ -74,9 +75,14 @@ public final class ResponseCodeHandler implements HttpHandler {
         this.responseCode = responseCode;
     }
 
+    public String toString() {
+        return "reponse-code( " + this.responseCode + " )";
+    }
+
     @Override
     public void handleRequest(final HttpServerExchange exchange) throws Exception {
         exchange.setStatusCode(responseCode);
+        UndertowLogger.PREDICATE_LOGGER.debugf("Response code set to [%s].", responseCode);
         if(traceEnabled) {
             log.tracef("Setting response code %s for exchange %s", responseCode, exchange);
         }
