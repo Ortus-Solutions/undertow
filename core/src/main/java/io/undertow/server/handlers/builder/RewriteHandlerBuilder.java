@@ -65,7 +65,7 @@ public class RewriteHandlerBuilder implements HandlerBuilder {
                 return new SetAttributeHandler(handler, ExchangeAttributes.relativePath(), value){
                    @Override
                     public void handleRequest(HttpServerExchange exchange) throws Exception {
-                        UndertowLogger.PREDICATE_LOGGER.debugf("Request rewritten to [%s].", getValue().readAttribute(exchange));
+                        UndertowLogger.PREDICATE_LOGGER.debugf("Request rewritten to [%s] for %s.", getValue().readAttribute(exchange), exchange);
                         super.handleRequest(exchange);
                     }
                     public String toString() {

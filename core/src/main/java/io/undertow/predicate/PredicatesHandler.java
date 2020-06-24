@@ -85,7 +85,7 @@ public class PredicatesHandler implements HttpHandler {
                 //if it has been marked as done
                 if (exchange.getAttachment(DONE) != null) {
                     if (outerHandler) {
-                        UndertowLogger.PREDICATE_LOGGER.tracef("Predicate chain marked done. Next handler is [%s].", next.toString());
+                        UndertowLogger.PREDICATE_LOGGER.tracef("Predicate chain marked done. Next handler is [%s] for %s.", next.toString(), exchange);
                     }
                     exchange.removeAttachment(CURRENT_POSITION);
                     next.handleRequest(exchange);
@@ -97,30 +97,30 @@ public class PredicatesHandler implements HttpHandler {
                 final Holder handler = handlers[pos];
                 if (handler.predicate.resolve(exchange)) {
                     if( handler.predicate.toString().equals("true") ) {
-                        UndertowLogger.PREDICATE_LOGGER.tracef("Executing handler [%s].", handler.handler.toString());
+                        UndertowLogger.PREDICATE_LOGGER.tracef("Executing handler [%s] for %s.", handler.handler.toString(), exchange);
                     } else {
-                        UndertowLogger.PREDICATE_LOGGER.tracef("Predicate [%s] resolved to true. Next handler is [%s].", handler.predicate.toString(), handler.handler.toString());
+                        UndertowLogger.PREDICATE_LOGGER.tracef("Predicate [%s] resolved to true. Next handler is [%s] for %s.", handler.predicate.toString(), handler.handler.toString(), exchange);
                     }
                     exchange.putAttachment(CURRENT_POSITION, pos + 1);
                     handler.handler.handleRequest(exchange);
                     if(shouldRestart(exchange, current)) {
-                        UndertowLogger.PREDICATE_LOGGER.tracef("Restarting predicate resolution for request.");
+                        UndertowLogger.PREDICATE_LOGGER.tracef("Restarting predicate resolution for %s.", exchange);
                         break;
                     } else {
                         return;
                     }
                 } else if(handler.elseBranch != null) {
-                    UndertowLogger.PREDICATE_LOGGER.tracef("Predicate [%s] resolved to false. Else branch is [%s].", handler.predicate.toString(), handler.elseBranch.toString());
+                    UndertowLogger.PREDICATE_LOGGER.tracef("Predicate [%s] resolved to false. Else branch is [%s] for %s.", handler.predicate.toString(), handler.elseBranch.toString(), exchange);
                     exchange.putAttachment(CURRENT_POSITION, pos + 1);
                     handler.elseBranch.handleRequest(exchange);
                     if(shouldRestart(exchange, current)) {
-                        UndertowLogger.PREDICATE_LOGGER.tracef("Restarting predicate resolution for request.");
+                        UndertowLogger.PREDICATE_LOGGER.tracef("Restarting predicate resolution for %s.", exchange);
                         break;
                     } else {
                         return;
                     }
                 } else {
-                    UndertowLogger.PREDICATE_LOGGER.tracef("Predicate [%s] resolved to false.", handler.predicate.toString());
+                    UndertowLogger.PREDICATE_LOGGER.tracef("Predicate [%s] resolved to false for %s.", handler.predicate.toString(), exchange);
                 }
             }
         } while (shouldRestart(exchange, current));
