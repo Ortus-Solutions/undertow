@@ -62,6 +62,7 @@ public class PredicatesHandler implements HttpHandler {
         this.outerHandler = outerHandler;
     }
 
+    @Override
     public String toString() {
         return "PredicatesHandler with " + handlers.length + " predicates";
     }
@@ -218,6 +219,7 @@ public class PredicatesHandler implements HttpHandler {
                             exchange.putAttachment(DONE, true);
                             handler.handleRequest(exchange);
                         }
+                        @Override
                         public String toString() {
                             return "done";
                         }
@@ -273,6 +275,7 @@ public class PredicatesHandler implements HttpHandler {
                             }
                             exchange.putAttachment(RESTART, true);
                         }
+                        @Override
                         public String toString() {
                             return "restart";
                         }

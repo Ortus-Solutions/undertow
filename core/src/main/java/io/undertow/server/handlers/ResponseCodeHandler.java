@@ -75,10 +75,6 @@ public final class ResponseCodeHandler implements HttpHandler {
         this.responseCode = responseCode;
     }
 
-    public String toString() {
-        return "reponse-code( " + this.responseCode + " )";
-    }
-
     @Override
     public void handleRequest(final HttpServerExchange exchange) throws Exception {
         exchange.setStatusCode(responseCode);
@@ -86,5 +82,10 @@ public final class ResponseCodeHandler implements HttpHandler {
         if(traceEnabled) {
             log.tracef("Setting response code %s for exchange %s", responseCode, exchange);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "response-code( " + this.responseCode + " )";
     }
 }

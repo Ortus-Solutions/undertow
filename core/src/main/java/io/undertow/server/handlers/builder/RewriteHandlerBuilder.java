@@ -18,7 +18,6 @@
 
 package io.undertow.server.handlers.builder;
 
-import io.undertow.attribute.ConstantExchangeAttribute;
 import io.undertow.attribute.ExchangeAttribute;
 import io.undertow.attribute.ExchangeAttributes;
 import io.undertow.server.HandlerWrapper;
@@ -68,12 +67,9 @@ public class RewriteHandlerBuilder implements HandlerBuilder {
                         UndertowLogger.PREDICATE_LOGGER.debugf("Request rewritten to [%s] for %s.", getValue().readAttribute(exchange), exchange);
                         super.handleRequest(exchange);
                     }
+                   @Override
                     public String toString() {
-                        if( getValue() instanceof ConstantExchangeAttribute ) {
-                            return "rewrite( '" + getValue().readAttribute(null) + "' )";
-                        } else {
-                            return "rewrite( '{ExchangeAttribute}' )";
-                        }
+                        return "rewrite( '" + getValue().toString() + "' )";
                     }
 
                 };
