@@ -17,7 +17,6 @@
  */
 package io.undertow.server.handlers;
 
-import io.undertow.UndertowLogger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -96,6 +95,11 @@ public class SetAttributeHandler implements HttpHandler {
     }
 
     @Override
+    public String toString() {
+        return "set( attribute='" + attribute.toString() + "', value='" + value.toString() + "' )";
+    }
+
+    @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         if (preCommit) {
             exchange.addResponseCommitListener(new ResponseCommitListener() {
@@ -153,19 +157,7 @@ public class SetAttributeHandler implements HttpHandler {
             return new HandlerWrapper() {
                 @Override
                 public HttpHandler wrap(HttpHandler handler) {
-                    return new SetAttributeHandler(handler, attribute, value, preCommit == null ? false : preCommit) {
-                        @Override
-                        public void handleRequest(HttpServerExchange exchange) throws Exception {
-                            UndertowLogger.PREDICATE_LOGGER.debugf("Set Attribute [%s] for %s.", getValue().readAttribute(exchange), exchange);
-                            super.handleRequest(exchange);
-                        }
-
-                        @Override
-                        public String toString() {
-                            return "set( attribute='"+attribute.toString()+"', value='" + getValue().toString() + "' )";
-                        }
-
-                    };
+                    return new SetAttributeHandler(handler, attribute, value, preCommit == null ? false : preCommit);
                 }
             };
         }

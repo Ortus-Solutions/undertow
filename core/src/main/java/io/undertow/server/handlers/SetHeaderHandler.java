@@ -17,7 +17,6 @@
  */
 package io.undertow.server.handlers;
 
-import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
 import io.undertow.attribute.ExchangeAttribute;
 import io.undertow.attribute.ExchangeAttributes;
@@ -99,6 +98,11 @@ public class SetHeaderHandler implements HttpHandler {
         return header;
     }
 
+    @Override
+    public String toString() {
+        return "set( header='" + header.toString() + "', value='" + value.toString() + "' )";
+    }
+
     public static class Builder implements HandlerBuilder {
 
         @Override
@@ -136,18 +140,7 @@ public class SetHeaderHandler implements HttpHandler {
             return new HandlerWrapper() {
                 @Override
                 public HttpHandler wrap(HttpHandler handler) {
-                    return new SetHeaderHandler(handler, header, value) {
-                        @Override
-                        public void handleRequest(HttpServerExchange exchange) throws Exception {
-                            UndertowLogger.PREDICATE_LOGGER.debugf("Set Header [%s] for %s.", getValue().readAttribute(exchange), exchange);
-                            super.handleRequest(exchange);
-                        }
-
-                        @Override
-                        public String toString() {
-                            return "set( header='"+header.toString()+"', value='" + getValue().toString() + "' )";
-                        }
-                    };
+                    return new SetHeaderHandler(handler, header, value);
                 }
             };
         }
