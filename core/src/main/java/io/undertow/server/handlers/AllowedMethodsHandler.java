@@ -66,12 +66,6 @@ public class AllowedMethodsHandler implements HttpHandler {
         return Collections.unmodifiableSet(allowedMethods);
     }
 
-
-    //public String toString() {
-      //  return "allowed-methods( search={" + String.join(", ", Arrays.asList(values)) + "}, value='" + attribute.toString() + "' )";
-
-    //}
-
     @Override
     public String toString() {
 

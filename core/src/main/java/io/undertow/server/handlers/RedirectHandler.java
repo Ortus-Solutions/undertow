@@ -17,7 +17,6 @@
  */
 package io.undertow.server.handlers;
 
-import io.undertow.UndertowLogger;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,6 +66,11 @@ public class RedirectHandler implements HttpHandler {
         exchange.endExchange();
     }
 
+    @Override
+    public String toString() {
+        return "redirect( '" + attribute.toString() + "' )";
+    }
+
     public static class Builder implements HandlerBuilder {
 
         @Override
@@ -94,27 +98,7 @@ public class RedirectHandler implements HttpHandler {
 
         @Override
         public HandlerWrapper build(Map<String, Object> config) {
-            //return new Wrapper((ExchangeAttribute)config.get("value"));
-            final ExchangeAttribute value = (ExchangeAttribute) config.get("value");
-            return new HandlerWrapper() {
-                @Override
-                public HttpHandler wrap(HttpHandler handler) {
-                    return new SetAttributeHandler(handler, ExchangeAttributes.relativePath(), value) {
-                        @Override
-                        public void handleRequest(HttpServerExchange exchange) throws Exception {
-                            UndertowLogger.PREDICATE_LOGGER.debugf("Request redirected to [%s] for %s.", getValue().readAttribute(exchange), exchange);
-                            super.handleRequest(exchange);
-                        }
-
-                        @Override
-                        public String toString() {
-                            return "redirect( '" + getValue().toString() + "' )";
-                        }
-
-                    };
-                }
-
-            };
+            return new Wrapper((ExchangeAttribute) config.get("value"));
         }
 
     }
