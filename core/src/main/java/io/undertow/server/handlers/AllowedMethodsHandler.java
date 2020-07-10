@@ -15,7 +15,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.undertow.server.handlers;
 
 import java.util.Arrays;
@@ -30,6 +29,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.builder.HandlerBuilder;
 import io.undertow.util.HttpString;
 import io.undertow.util.StatusCodes;
+import java.util.stream.Collectors;
 
 /**
  * Handler that whitelists certain HTTP methods. Only requests with a method in
@@ -66,6 +66,22 @@ public class AllowedMethodsHandler implements HttpHandler {
         return Collections.unmodifiableSet(allowedMethods);
     }
 
+
+    //public String toString() {
+      //  return "allowed-methods( search={" + String.join(", ", Arrays.asList(values)) + "}, value='" + attribute.toString() + "' )";
+
+    //}
+
+    @Override
+    public String toString() {
+
+        if (allowedMethods.size() == 1) {
+            return "allowed-methods( " + allowedMethods.toArray()[0] + " )";
+        } else {
+            return "allowed-methods( {" + allowedMethods.stream().map(s -> s.toString()).collect(Collectors.joining(", ")) + "} )";
+        }
+    }
+
     public static class Builder implements HandlerBuilder {
 
         @Override
@@ -90,7 +106,8 @@ public class AllowedMethodsHandler implements HttpHandler {
 
         @Override
         public HandlerWrapper build(Map<String, Object> config) {
-            return new Wrapper((String[]) config.get("methods"));
+            return new Wrapper((String[]) config.get("methods")) {
+            };
         }
 
     }
@@ -106,9 +123,9 @@ public class AllowedMethodsHandler implements HttpHandler {
         @Override
         public HttpHandler wrap(HttpHandler handler) {
             HttpString[] strings = new HttpString[methods.length];
-                for(int i = 0; i < methods.length; ++i) {
-                    strings[i] = new HttpString(methods[i]);
-                }
+            for (int i = 0; i < methods.length; ++i) {
+                strings[i] = new HttpString(methods[i]);
+            }
 
             return new AllowedMethodsHandler(handler, strings);
         }

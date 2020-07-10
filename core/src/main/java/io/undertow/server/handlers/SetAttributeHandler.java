@@ -15,9 +15,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.undertow.server.handlers;
 
+import io.undertow.UndertowLogger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -35,8 +35,8 @@ import io.undertow.server.ResponseCommitListener;
 import io.undertow.server.handlers.builder.HandlerBuilder;
 
 /**
- * Handler that can set an arbitrary attribute on the exchange. Both the attribute and the
- * value to set are expressed as exchange attributes.
+ * Handler that can set an arbitrary attribute on the exchange. Both the
+ * attribute and the value to set are expressed as exchange attributes.
  *
  *
  * @author Stuart Douglas
@@ -97,7 +97,7 @@ public class SetAttributeHandler implements HttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        if(preCommit) {
+        if (preCommit) {
             exchange.addResponseCommitListener(new ResponseCommitListener() {
                 @Override
                 public void beforeCommit(HttpServerExchange exchange) {
@@ -115,6 +115,7 @@ public class SetAttributeHandler implements HttpHandler {
     }
 
     public static class Builder implements HandlerBuilder {
+
         @Override
         public String name() {
             return "set";
@@ -152,13 +153,26 @@ public class SetAttributeHandler implements HttpHandler {
             return new HandlerWrapper() {
                 @Override
                 public HttpHandler wrap(HttpHandler handler) {
-                    return new SetAttributeHandler(handler, attribute, value, preCommit == null ? false : preCommit);
+                    return new SetAttributeHandler(handler, attribute, value, preCommit == null ? false : preCommit) {
+                        @Override
+                        public void handleRequest(HttpServerExchange exchange) throws Exception {
+                            UndertowLogger.PREDICATE_LOGGER.debugf("Set Attribute [%s] for %s.", getValue().readAttribute(exchange), exchange);
+                            super.handleRequest(exchange);
+                        }
+
+                        @Override
+                        public String toString() {
+                            return "set( attribute='"+attribute.toString()+"', value='" + getValue().toString() + "' )";
+                        }
+
+                    };
                 }
             };
         }
     }
 
     public static class ClearBuilder implements HandlerBuilder {
+
         @Override
         public String name() {
             return "clear";

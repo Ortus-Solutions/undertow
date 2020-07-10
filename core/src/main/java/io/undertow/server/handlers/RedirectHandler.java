@@ -15,9 +15,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.undertow.server.handlers;
 
+import io.undertow.UndertowLogger;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +34,8 @@ import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 
 /**
- * A redirect handler that redirects to the specified location via a 302 redirect.
+ * A redirect handler that redirects to the specified location via a 302
+ * redirect.
  * <p>
  * The location is specified as an exchange attribute string.
  *
@@ -66,7 +67,6 @@ public class RedirectHandler implements HttpHandler {
         exchange.endExchange();
     }
 
-
     public static class Builder implements HandlerBuilder {
 
         @Override
@@ -94,8 +94,27 @@ public class RedirectHandler implements HttpHandler {
 
         @Override
         public HandlerWrapper build(Map<String, Object> config) {
+            //return new Wrapper((ExchangeAttribute)config.get("value"));
+            final ExchangeAttribute value = (ExchangeAttribute) config.get("value");
+            return new HandlerWrapper() {
+                @Override
+                public HttpHandler wrap(HttpHandler handler) {
+                    return new SetAttributeHandler(handler, ExchangeAttributes.relativePath(), value) {
+                        @Override
+                        public void handleRequest(HttpServerExchange exchange) throws Exception {
+                            UndertowLogger.PREDICATE_LOGGER.debugf("Request redirected to [%s] for %s.", getValue().readAttribute(exchange), exchange);
+                            super.handleRequest(exchange);
+                        }
 
-            return new Wrapper((ExchangeAttribute)config.get("value"));
+                        @Override
+                        public String toString() {
+                            return "redirect( '" + getValue().toString() + "' )";
+                        }
+
+                    };
+                }
+
+            };
         }
 
     }
