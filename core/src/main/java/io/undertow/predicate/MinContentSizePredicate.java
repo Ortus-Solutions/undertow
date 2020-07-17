@@ -48,6 +48,11 @@ public class MinContentSizePredicate implements Predicate {
         return Long.parseLong(length) < minSize;
     }
 
+    @Override
+    public String toString() {
+        return "max-content-size( " + minSize + " )";
+    }
+
     public static class Builder implements PredicateBuilder {
 
         @Override

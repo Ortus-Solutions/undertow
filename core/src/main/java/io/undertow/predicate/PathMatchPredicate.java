@@ -21,6 +21,7 @@ package io.undertow.predicate;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.PathMatcher;
@@ -45,7 +46,12 @@ public class PathMatchPredicate implements Predicate {
     }
 
     public String toString() {
-        return "path( '" + pathMatcher.getExactPathMatchesList() +  "' )";
+        Set<String> matches = pathMatcher.getExactPathMatchesSet();
+        if( matches.size() == 1 ) {
+            return "path( '" + matches.toArray()[0] +  "' )";
+        } else {
+            return "path( { '" + matches.stream().collect(Collectors.joining("', '")) +  "' } )";
+        }
     }
 
     @Override

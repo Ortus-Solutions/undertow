@@ -57,8 +57,13 @@ public class PathMatcher<T> {
     public PathMatcher() {
     }
 
-    public String getExactPathMatchesList(){
-        return String.join(", ", exactPathMatches.keySet());
+    public Set<String> getExactPathMatchesSet(){
+        return exactPathMatches.keySet();
+    }
+
+
+    public Set<String> getPathMatchesSet(){
+        return paths.toMap().keySet();
     }
 
     /**

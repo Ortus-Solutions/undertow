@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.PathMatcher;
@@ -59,6 +60,15 @@ public class PathPrefixPredicate implements Predicate {
             context.put("remaining", result.getRemaining());
         }
         return matches;
+    }
+
+    public String toString() {
+        Set<String> matches = pathMatcher.getPathMatchesSet();
+        if( matches.size() == 1 ) {
+            return "path-prefix( '" + matches.toArray()[0] +  "' )";
+        } else {
+            return "path-prefix( { '" + matches.stream().collect(Collectors.joining("', '")) +  "' } )";
+        }
     }
 
     public static class Builder implements PredicateBuilder {
