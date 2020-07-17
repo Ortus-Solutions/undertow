@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.PathMatcher;
+import io.undertow.UndertowLogger;
 
 /**
  * @author Stuart Douglas
@@ -33,6 +34,11 @@ import io.undertow.util.PathMatcher;
 public class PathPrefixPredicate implements Predicate {
 
     private final PathMatcher<Boolean> pathMatcher;
+    private static final boolean traceEnabled;
+
+    static {
+        traceEnabled = UndertowLogger.PREDICATE_LOGGER.isTraceEnabled();
+    }
 
     PathPrefixPredicate(final String... paths) {
         PathMatcher<Boolean> matcher = new PathMatcher<>();
@@ -52,10 +58,17 @@ public class PathPrefixPredicate implements Predicate {
         PathMatcher.PathMatch<Boolean> result = pathMatcher.match(relativePath);
 
         boolean matches = Boolean.TRUE.equals(result.getValue());
+
+        if (traceEnabled) {
+            UndertowLogger.PREDICATE_LOGGER.tracef("Path prefix(s) [%s] %s input [%s] for %s.", pathMatcher.getPathMatchesSet().stream().collect(Collectors.joining(", ")), (matches ? "MATCH" : "DO NOT MATCH" ), relativePath, value);
+        }
         if(matches) {
             Map<String, Object> context = value.getAttachment(PREDICATE_CONTEXT);
             if(context == null) {
                 value.putAttachment(PREDICATE_CONTEXT, context = new TreeMap<>());
+            }
+            if (traceEnabled && result.getRemaining().length() > 0 ) {
+                UndertowLogger.PREDICATE_LOGGER.tracef("Storing \"remaining\" string of [%s] for %s.", result.getRemaining(), value);
             }
             context.put("remaining", result.getRemaining());
         }

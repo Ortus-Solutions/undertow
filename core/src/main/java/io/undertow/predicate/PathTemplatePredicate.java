@@ -28,6 +28,7 @@ import io.undertow.attribute.ExchangeAttribute;
 import io.undertow.attribute.ExchangeAttributes;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.PathTemplate;
+import io.undertow.UndertowLogger;
 
 /**
  * @author Stuart Douglas
@@ -37,6 +38,11 @@ public class PathTemplatePredicate implements Predicate {
     private final ExchangeAttribute attribute;
     private final String template;
     private final PathTemplate value;
+    private static final boolean traceEnabled;
+
+    static {
+        traceEnabled = UndertowLogger.PREDICATE_LOGGER.isTraceEnabled();
+    }
 
     public PathTemplatePredicate(final String template, final ExchangeAttribute attribute) {
         this.attribute = attribute;
@@ -52,10 +58,16 @@ public class PathTemplatePredicate implements Predicate {
             return false;
         }
         boolean result = this.value.matches(path, params);
+        if (traceEnabled) {
+            UndertowLogger.PREDICATE_LOGGER.tracef("Path template [%s] %s input [%s] for %s.", template, (result ? "MATCHES" : "DOES NOT MATCH" ), path, exchange);
+        }
         if (result) {
             Map<String, Object> context = exchange.getAttachment(PREDICATE_CONTEXT);
             if(context == null) {
                 exchange.putAttachment(PREDICATE_CONTEXT, context = new TreeMap<>());
+            }
+            if (traceEnabled ) {
+                params.entrySet().forEach( param -> UndertowLogger.PREDICATE_LOGGER.tracef("Storing template match [%s=%s] for %s.", param.getKey(), param.getValue(), exchange) );
             }
             context.putAll(params);
         }
