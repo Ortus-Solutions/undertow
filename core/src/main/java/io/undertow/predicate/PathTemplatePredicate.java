@@ -35,10 +35,12 @@ import io.undertow.util.PathTemplate;
 public class PathTemplatePredicate implements Predicate {
 
     private final ExchangeAttribute attribute;
+    private final String template;
     private final PathTemplate value;
 
     public PathTemplatePredicate(final String template, final ExchangeAttribute attribute) {
         this.attribute = attribute;
+        this.template = template;
         this.value = PathTemplate.create(template);
     }
 
@@ -58,6 +60,14 @@ public class PathTemplatePredicate implements Predicate {
             context.putAll(params);
         }
         return result;
+    }
+
+    public String toString() {
+        if( attribute == ExchangeAttributes.relativePath() ) {
+            return "path-template( '" + template +  "' )";
+        } else {
+            return "path-template( value='" + template +  "', match='" + attribute.toString() + "' )";
+        }
     }
 
     public static class Builder implements PredicateBuilder {

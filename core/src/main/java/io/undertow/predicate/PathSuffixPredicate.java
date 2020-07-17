@@ -40,6 +40,10 @@ public class PathSuffixPredicate implements Predicate {
         return value.getRelativePath().endsWith(suffix);
     }
 
+    public String toString() {
+        return "path-suffix( '" + suffix +  "' )";
+    }
+
 
     public static class Builder implements PredicateBuilder {
 
