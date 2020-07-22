@@ -30,6 +30,8 @@ import io.undertow.server.handlers.proxy.ProxyCallback;
 import io.undertow.server.handlers.proxy.ProxyClient;
 import io.undertow.server.handlers.proxy.ProxyConnection;
 import io.undertow.util.AttachmentKey;
+import java.util.ArrayList;
+import java.util.List;
 
 class ModClusterProxyClient implements ProxyClient {
 
