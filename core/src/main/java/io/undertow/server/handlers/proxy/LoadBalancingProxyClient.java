@@ -15,7 +15,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package io.undertow.server.handlers.proxy;
 
 import io.undertow.UndertowLogger;
@@ -41,20 +40,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.undertow.server.handlers.proxy.ProxyConnectionPool.AvailabilityType.*;
 import static io.undertow.server.handlers.proxy.RouteIteratorFactory.*;
+import java.util.ArrayList;
+import java.util.List;
 import static org.xnio.IoUtils.safeClose;
 
 /**
- * Initial implementation of a load balancing proxy client. This initial implementation is rather simplistic, and
- * will likely change.
+ * Initial implementation of a load balancing proxy client. This initial
+ * implementation is rather simplistic, and will likely change.
  *
  * @author Stuart Douglas
  */
 public class LoadBalancingProxyClient implements ProxyClient {
 
     /**
-     * The attachment key that is used to attach the proxy connection to the exchange.
+     * The attachment key that is used to attach the proxy connection to the
+     * exchange.
      * <p>
-     * This cannot be static as otherwise a connection from a different client could be re-used.
+     * This cannot be static as otherwise a connection from a different client
+     * could be re-used.
      */
     private final AttachmentKey<ExclusiveConnectionHolder> exclusiveConnectionKey = AttachmentKey.create(ExclusiveConnectionHolder.class);
 
@@ -91,6 +94,27 @@ public class LoadBalancingProxyClient implements ProxyClient {
     private static final ProxyTarget PROXY_TARGET = new ProxyTarget() {
     };
 
+    @Override
+    public List<ProxyTarget> getAllTargets() {
+        List<ProxyTarget> arr = new ArrayList();
+        for (Host host : hosts) {
+            HostProxyTarget proxyTarget = new HostProxyTarget() {
+                Host host;
+                public void setHost(Host host) {
+                    this.host = host;
+                }
+                public String toString(){
+                    return host.getUri().toString();
+                }
+            };
+            proxyTarget.setHost(host);
+            arr.add(proxyTarget);
+        }
+        return arr;
+    }
+
+
+
     public LoadBalancingProxyClient() {
         this(UndertowClient.getInstance());
     }
@@ -111,7 +135,7 @@ public class LoadBalancingProxyClient implements ProxyClient {
         this.client = client;
         this.exclusivityChecker = exclusivityChecker;
         sessionCookieNames.add("JSESSIONID");
-        if(hostSelector == null) {
+        if (hostSelector == null) {
             this.hostSelector = new RoundRobinHostSelector();
         } else {
             this.hostSelector = hostSelector;
@@ -171,7 +195,8 @@ public class LoadBalancingProxyClient implements ProxyClient {
     }
 
     /**
-     * Configures ranked route delimiter, enabling ranked routing parsing strategy.
+     * Configures ranked route delimiter, enabling ranked routing parsing
+     * strategy.
      */
     public LoadBalancingProxyClient setRankedRoutingDelimiter(String rankedRoutingDelimiter) {
         this.routeIteratorFactory = new RouteIteratorFactory(RouteParsingStrategy.RANKED, ParsingCompatibility.MOD_JK, rankedRoutingDelimiter);
@@ -190,7 +215,6 @@ public class LoadBalancingProxyClient implements ProxyClient {
         return addHost(host, jvmRoute, null);
     }
 
-
     public synchronized LoadBalancingProxyClient addHost(final URI host, String jvmRoute, XnioSsl ssl) {
 
         Host h = new Host(jvmRoute, null, host, ssl, OptionMap.EMPTY);
@@ -205,11 +229,9 @@ public class LoadBalancingProxyClient implements ProxyClient {
         return this;
     }
 
-
     public synchronized LoadBalancingProxyClient addHost(final URI host, String jvmRoute, XnioSsl ssl, OptionMap options) {
         return addHost(null, host, jvmRoute, ssl, options);
     }
-
 
     public synchronized LoadBalancingProxyClient addHost(final InetSocketAddress bindAddress, final URI host, String jvmRoute, XnioSsl ssl, OptionMap options) {
         Host h = new Host(jvmRoute, bindAddress, host, ssl, options);
@@ -330,7 +352,7 @@ public class LoadBalancingProxyClient implements ProxyClient {
             // Attempt to find the first existing host which was not yet attempted
             Host host = this.routes.get(parsedRoutes.next().toString());
             if (host != null) {
-                if(attempted == null || !attempted.contains(host)) {
+                if (attempted == null || !attempted.contains(host)) {
                     return host;
                 }
             }
@@ -343,7 +365,7 @@ public class LoadBalancingProxyClient implements ProxyClient {
         Host problem = null;
         do {
             Host selected = hosts[host];
-            if(attempted == null || !attempted.contains(selected)) {
+            if (attempted == null || !attempted.contains(selected)) {
                 ProxyConnectionPool.AvailabilityType available = selected.connectionPool.available();
                 if (available == AVAILABLE) {
                     return selected;
@@ -384,12 +406,13 @@ public class LoadBalancingProxyClient implements ProxyClient {
      * It is not thread safe so internal state can get messed up.
      */
     public void closeCurrentConnections() {
-        for(Host host : hosts) {
+        for (Host host : hosts) {
             host.closeCurrentConnections();
         }
     }
 
     public final class Host extends ConnectionPoolErrorHandler.SimpleConnectionPoolErrorHandler implements ConnectionPoolManager {
+
         final ProxyConnectionPool connectionPool;
         final String jvmRoute;
         final URI uri;

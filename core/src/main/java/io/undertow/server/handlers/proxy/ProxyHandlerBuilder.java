@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Stuart Douglas
@@ -74,16 +73,7 @@ public class ProxyHandlerBuilder implements HandlerBuilder {
                 loadBalancingProxyClient.addHost(url);
             }
 
-            return new ProxyHandler(loadBalancingProxyClient, -1, handler, rewriteHostHeader, false) {
-                @Override
-                public String toString() {
-                    if (uris.size() == 1) {
-                        return "reverse-proxy( " + uris.toArray()[0] + " )";
-                    } else {
-                        return "reverse-proxy( {" + uris.stream().map(s -> s.toString()).collect(Collectors.joining(", ")) + "} )";
-                    }
-                }
-            };
+            return new ProxyHandler(loadBalancingProxyClient, -1, handler, rewriteHostHeader, false);
         }
     }
 
